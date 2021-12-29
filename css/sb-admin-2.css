@@ -11279,3 +11279,23 @@ footer.sticky-footer .copyright {
 body.sidebar-toggled footer.sticky-footer {
   width: 100%;
 }
+
+.form-check-label {
+  width: 100%;
+}
+
+.form-checkbox-input .range-data {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.form-checkbox-input label{
+  margin: 0 1rem 0 0;
+}
+.form-checkbox-input input {
+  width: fit-content;
+}
+
+.checkbox-input {
+  margin-top: 0.7rem;
+}
