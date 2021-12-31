@@ -13,6 +13,8 @@ dotenv.config() // Makes environment variables available
 // Import routes
 // const userRouter = require('./routes/user')
 
+console.log(`API_KEY => ${process.env.API_KEY}`)
+console.log(`API_URL => ${process.env.API_URL}`)
 
 
 
