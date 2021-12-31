@@ -11299,3 +11299,7 @@ body.sidebar-toggled footer.sticky-footer {
 .checkbox-input {
   margin-top: 0.7rem;
 }
+
+.submit-area {
+  margin-top: 1rem;
+}

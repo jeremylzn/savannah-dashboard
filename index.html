@@ -95,32 +95,30 @@
 
                         <div class="col-lg-12 mb-4">
 
-                            <!-- Illustrations -->
+                            <!-- Get Data -->
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">Get Data</h6>
                                 </div>
                                 <div class="card-body">
 
-                                    <form>
+                                    <form id="getDataForm">
 
                                         <div class="form-group address">
                                             <label for="address-input">Address :</label>
-                                            <input type="text" class="form-control" id="address-input"
-                                                aria-describedby="address-input">
+                                            <input type="text" class="form-control" id="address-input" aria-describedby="address-input" name="address">
                                         </div>
 
                                         <div class="form-group report-type">
                                             <label>Report Type :</label>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="transaction">
+                                                <input class="form-check-input" type="radio" id="transaction" name="report" value="transaction">
                                                 <label class="form-check-label" for="transaction">
                                                     Transaction
                                                 </label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="erc-20">
+                                                <input class="form-check-input" type="radio" id="erc-20" name="report" value="erc-20">
                                                 <label class="form-check-label" for="erc-20">
                                                     ERC-20
                                                 </label>
@@ -130,25 +128,23 @@
                                         <div class="form-group range form-checkbox-input">
                                             <label>Range :</label>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="all-range">
+                                                <input class="form-check-input" type="radio" name="range" value="1" id="all-range">
                                                 <label class="form-check-label" for="all-range">
                                                     ALL
                                                 </label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input checkbox-input" type="checkbox" value="" id="ranged">
+                                                <input class="form-check-input checkbox-input" type="radio" name="range" value="0" id="ranged">
                                                 <label class="form-check-label" for="ranged">
 
                                                     <div class="row ranging-date">
                                                         <div class="col-md-4 range-data">
-                                                            <label for="start-date">Start Date : </label> <input
-                                                                type="date" class="form-control" id="start-date"
-                                                                aria-describedby="start-date">
+                                                            <label for="start-date">Start Date : </label>
+                                                            <input type="date" class="form-control" id="start-date" name="start" aria-describedby="start-date">
                                                         </div>
                                                         <div class="col-md-8 range-data">
-                                                            <label for="end-date">End Date : </label> <input type="date"
-                                                                class="form-control" id="end-date"
-                                                                aria-describedby="end-date">
+                                                            <label for="end-date">End Date : </label>
+                                                            <input type="date" class="form-control" id="end-date" name="end" aria-describedby="end-date">
                                                         </div>
                                                     </div>
 
@@ -159,14 +155,13 @@
                                         <div class="form-group divide-excel">
                                             <label>Number of Excel files :</label>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value=""
-                                                    id="single">
+                                                <input class="form-check-input" type="radio" name="divided" value="0" id="single">
                                                 <label class="form-check-label" for="single">
                                                     1
                                                 </label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="multiple">
+                                                <input class="form-check-input" type="radio" name="divided" value="1" id="multiple">
                                                 <label class="form-check-label" for="multiple">
                                                     Divided
                                                 </label>
@@ -176,34 +171,40 @@
                                         <div class="form-group download-type form-checkbox-input">
                                             <label>Download Type :</label>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="new-file">
+                                                <input class="form-check-input" type="radio" name="new-file" value="1" id="new-file">
                                                 <label class="form-check-label" for="new-file">
                                                     New File
                                                 </label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input checkbox-input" type="checkbox" value="" id="exist-file">
+                                                <input class="form-check-input checkbox-input" type="radio" name="new-file" value="0" id="exist-file">
                                                 <label class="form-check-label" for="exist-file">
 
                                                     <div class="row ranging-date">
                                                         <div class="col-md-4 range-data">
-                                                            <label for="upload-file">Upload File : </label> <input
-                                                                type="text" class="form-control" id="upload-file"
-                                                                aria-describedby="upload-file">
+                                                            <label for="upload-file">Upload File : </label>
+                                                            <input type="file" class="form-control" id="upload-file" name="uploaded" aria-describedby="upload-file">
                                                         </div>
                                                         <div class="col-md-4 range-data">
-                                                            <label for="sheet-name">Sheet Name : </label> <input type="text"
-                                                                class="form-control" id="sheet-name"
-                                                                aria-describedby="sheet-name">
+                                                            <label for="sheet-name">Sheet Name : </label>
+                                                            <input type="text" class="form-control" id="sheet-name" name="sheet" aria-describedby="sheet-name">
                                                         </div>
                                                         <div class="col-md-4 range-data">
-                                                            <label for="from-cell">From Cell : </label> <input type="text"
-                                                                class="form-control" id="from-cell"
-                                                                aria-describedby="from-cell">
+                                                            <label for="from-cell">From Cell : </label>
+                                                            <input type="text" class="form-control" id="from-cell" name="cell" aria-describedby="from-cell">
                                                         </div>
                                                     </div>
 
                                                 </label>
+                                            </div>
+
+                                            <div class="submit-area">
+                                                <a class="btn btn-primary btn-icon-split" id="getDataSubmit" style="width: 100%; display: block;">
+                                                    <span class="icon text-white-50" style="padding: 0.375rem 3rem; float: left">
+                                                        <i class="fas fa-arrow-right"></i>
+                                                    </span>
+                                                    <span class="text">Download my sheet</span>
+                                                </a>
                                             </div>
                                         </div>
 
@@ -250,6 +251,7 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
+    <script src="js/index.js"></script>
 
     <!-- Page level plugins -->
     <script src="vendor/chart.js/Chart.min.js"></script>
