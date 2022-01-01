@@ -11,7 +11,7 @@ dotenv.config() // Makes environment variables available
 
 
 // Import routes
-// const userRouter = require('./routes/user')
+const excelRouter = require('./routes/excel')
 
 console.log(`API_KEY => ${process.env.API_KEY}`)
 console.log(`API_URL => ${process.env.API_URL}`)
@@ -38,7 +38,7 @@ app.use(express.static(path.resolve(__dirname,"../")));
 const port = process.env.PORT || 3000
 
 // Use routes
-// app.use(userRouter)
+app.use(excelRouter)
 
 app.get('/', (req,res) => {
     res.sendFile(path.resolve(__dirname,"../"))

@@ -2,11 +2,18 @@
     "use strict"; // Start of use strict
 
     // Submit get data
-    $("#getDataSubmit").on('click', function (e) {
+    $("#getDataSubmit").on('click', async function (e) {
         console.log("clicked")
         let form = creationFormObject($('#getDataForm').serializeArray())
         console.log(form)
-        
+
+        await post("excel", form).then(response => response.blob())
+        .then(blob => URL.createObjectURL(blob))
+        .then(url => {
+            window.open(url, '_blank');
+            URL.revokeObjectURL(url);
+        });
+
 
     });
 
