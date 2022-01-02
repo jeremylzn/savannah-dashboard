@@ -3,11 +3,15 @@ const router = new express.Router();
 const etherscan = require('../middleware/etherscan');
 const JSZip = require('jszip');
 const buffer = require("buffer");
+const fs = require('fs');
 
 
 router.post('/excel', async(req, res) => {
     try {
         console.log(req.body)
+        console.log(req.file)
+        console.log(req.files)
+
         result = await etherscan.IterateOnAllBlockNo(req.body.report, req.body.address);
 
         if (parseInt(req.body.divided)){
@@ -24,7 +28,12 @@ router.post('/excel', async(req, res) => {
             console.log("Finish")
             res.send(final);
         } else {
-            const stream = await etherscan.createExcel(etherscan.getColumnList(req.body.report), result, req.body.report, req.body.address);
+            if (req.files){
+                fs.writeFileSync('tmp.xlsx', req.files['files'].data);
+                var stream = await etherscan.createExistingExcel(etherscan.getColumnList(req.body.report), result, 'tmp.xlsx', req.body.sheet, req.body.cell);
+            } else {
+                var stream = await etherscan.createExcel(etherscan.getColumnList(req.body.report), result, req.body.report, req.body.address);
+            }
             res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             res.setHeader('Content-Disposition', `attachment; filename=test.xlsx`);
             res.setHeader('Content-Length', stream.length);

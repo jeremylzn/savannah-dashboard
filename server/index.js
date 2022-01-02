@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv') 
 dotenv.config() // Makes environment variables available
+const fileUpload = require('express-fileupload');
 
 
 
@@ -20,10 +21,12 @@ console.log(`API_URL => ${process.env.API_URL}`)
 
 // Initialize server
 const app = express()
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors())
+app.use(fileUpload()); // Don't forget this line!
+
 
 // CORS configuration
 app.use(function(req, res, next) {
