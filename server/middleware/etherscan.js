@@ -3,27 +3,50 @@ const excel = require('exceljs');
 const utils = require('./utils')
 
 
-let IterateOnAllBlockNo = async (report, address) => {
+let IterateOnAllBlockNo = async (report, address, start, end) => {
   let pattern = "startblock="
   let result = []
   let lastBlockNo;
   let lastResultNo = 10000;
   let status = 1
-  // while (lastResultNo >=10000){
+
+
+  // if (start && end) {
+  //   fromToList = await utils.getBlockNoByDate(start, end)
+  //   console.log(fromToList)
+  //   pattern = `startblock=${fromToList[0]}&endblock=${fromToList[1]}`
+  //   while (lastResultNo >= 10000) {
   //     console.log(pattern)
-  //     if (result.length){
-  //         lastBlockNo = result[result.length - 1]["blockNumber"]
-  //         pattern = `startblock=${lastBlockNo}`
+  //     if (result.length) {
+  //       lastBlockNo = result[result.length - 1]["blockNumber"]
+  //       pattern = `startblock=${lastBlockNo}&endblock=${fromToList[1]}`
   //     }
   //     response = await getData(report, address, pattern);
   //     result.push(...response.data.result);
   //     status = response.data.status
   //     lastResultNo = response.data.result.length
   //     console.log("Lenght of last result : " + (lastResultNo).toString())
-  //     console.log("Lenght of result : " + (result.length).toString())
+  //     console.log("Lenght of global result : " + (result.length).toString())
+  //     console.log("Status : " + (status).toString())
+  //     console.log("Message : " + (response.data.message).toString())
+  //   }
+  // } else {
+  //   while (lastResultNo >= 10000) {
+  //     console.log(pattern)
+  //     if (result.length) {
+  //       lastBlockNo = result[result.length - 1]["blockNumber"]
+  //       pattern = `startblock=${lastBlockNo}`
+  //     }
+  //     response = await getData(report, address, pattern);
+  //     result.push(...response.data.result);
+  //     status = response.data.status
+  //     lastResultNo = response.data.result.length
+  //     console.log("Lenght of last result : " + (lastResultNo).toString())
+  //     console.log("Lenght of global result : " + (result.length).toString())
   //     console.log("Status : " + (status).toString())
   //     console.log("Message : " + (response.data.message).toString())
 
+  //   }
   // }
 
 
@@ -74,8 +97,8 @@ async function createExistingExcel(headers, rows, filename, sheet, cell) {
   // });
 
 
-  console.log(filename)
-  console.log(sheet)
+  // console.log(filename)
+  // console.log(sheet)
   // console.log(file[''].data)
   // var workbook = new excel.Workbook(); 
   // await workbook.xlsx.readFile(filename)
@@ -110,25 +133,25 @@ async function createExistingExcel(headers, rows, filename, sheet, cell) {
   // }
 
 
-  var sourceWorkbook= new excel.Workbook();
-  var sourceWorksheet;
+  // var sourceWorkbook= new excel.Workbook();
+  // var sourceWorksheet;
 
-  var targetWorkbook = new excel.stream.xlsx.WorkbookWriter({});
-  var targetSheet = targetWorkbook.addWorksheet();
+  // var targetWorkbook = new excel.stream.xlsx.WorkbookWriter({});
+  // var targetSheet = targetWorkbook.addWorksheet();
 
-  sourceWorkbook.xlsx.readFile(filename).then(function(){
-      sourceWorksheet= sourceWorkbook.getWorksheet(1);
-      sourceWorksheet.eachRow((row, rowNumber) => {
-          var newRow = targetSheet.getRow(rowNumber);
-          row.eachCell((cell, colNumber) => {
-              var newCell = newRow.getCell(colNumber)
-              for(var prop in cell)
-              {
-                  newCell[prop] = cell[prop];
-              }
-          })
-    })
-  });
+  // sourceWorkbook.xlsx.readFile(filename).then(function(){
+  //     sourceWorksheet= sourceWorkbook.getWorksheet(1);
+  //     sourceWorksheet.eachRow((row, rowNumber) => {
+  //         var newRow = targetSheet.getRow(rowNumber);
+  //         row.eachCell((cell, colNumber) => {
+  //             var newCell = newRow.getCell(colNumber)
+  //             for(var prop in cell)
+  //             {
+  //                 newCell[prop] = cell[prop];
+  //             }
+  //         })
+  //   })
+  // });
 
   // for (let i = 0; i < rows.length; i++) {
   //   let timestamp = rows[i]['timeStamp'];
@@ -294,7 +317,7 @@ let getNameFile = (report, address) => {
 
 let extractNumber = (string) => {
   var matches = string.match(/(\d+)/);
-  
+
   if (matches) {
     new_string = string.replace(matches[0], "")
     console.log(new_string)

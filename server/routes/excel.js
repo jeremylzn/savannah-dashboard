@@ -9,10 +9,10 @@ const fs = require('fs');
 router.post('/excel', async(req, res) => {
     try {
         console.log(req.body)
-        console.log(req.file)
         console.log(req.files)
 
-        result = await etherscan.IterateOnAllBlockNo(req.body.report, req.body.address);
+        result = await etherscan.IterateOnAllBlockNo(req.body.report, req.body.address, (req.body.start) ? req.body.start : false, (req.body.end) ? req.body.end : false);
+
 
         if (parseInt(req.body.divided)){
             var zip = new JSZip();
