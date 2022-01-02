@@ -1,7 +1,9 @@
 const axios = require('axios');
 const excel = require('exceljs');
 const utils = require('./utils')
-
+const fs = require('fs');
+const XLSX = require('xlsx');
+const xlsxPopulate = require('xlsx-populate')
 
 let IterateOnAllBlockNo = async (report, address, start, end) => {
   let pattern = "startblock="
@@ -11,47 +13,47 @@ let IterateOnAllBlockNo = async (report, address, start, end) => {
   let status = 1
 
 
-  // if (start && end) {
-  //   fromToList = await utils.getBlockNoByDate(start, end)
-  //   console.log(fromToList)
-  //   pattern = `startblock=${fromToList[0]}&endblock=${fromToList[1]}`
-  //   while (lastResultNo >= 10000) {
-  //     console.log(pattern)
-  //     if (result.length) {
-  //       lastBlockNo = result[result.length - 1]["blockNumber"]
-  //       pattern = `startblock=${lastBlockNo}&endblock=${fromToList[1]}`
-  //     }
-  //     response = await getData(report, address, pattern);
-  //     result.push(...response.data.result);
-  //     status = response.data.status
-  //     lastResultNo = response.data.result.length
-  //     console.log("Lenght of last result : " + (lastResultNo).toString())
-  //     console.log("Lenght of global result : " + (result.length).toString())
-  //     console.log("Status : " + (status).toString())
-  //     console.log("Message : " + (response.data.message).toString())
-  //   }
-  // } else {
-  //   while (lastResultNo >= 10000) {
-  //     console.log(pattern)
-  //     if (result.length) {
-  //       lastBlockNo = result[result.length - 1]["blockNumber"]
-  //       pattern = `startblock=${lastBlockNo}`
-  //     }
-  //     response = await getData(report, address, pattern);
-  //     result.push(...response.data.result);
-  //     status = response.data.status
-  //     lastResultNo = response.data.result.length
-  //     console.log("Lenght of last result : " + (lastResultNo).toString())
-  //     console.log("Lenght of global result : " + (result.length).toString())
-  //     console.log("Status : " + (status).toString())
-  //     console.log("Message : " + (response.data.message).toString())
+  if (start && end) {
+    fromToList = await utils.getBlockNoByDate(start, end)
+    console.log(fromToList)
+    pattern = `startblock=${fromToList[0]}&endblock=${fromToList[1]}`
+    while (lastResultNo >= 10000) {
+      console.log(pattern)
+      if (result.length) {
+        lastBlockNo = result[result.length - 1]["blockNumber"]
+        pattern = `startblock=${lastBlockNo}&endblock=${fromToList[1]}`
+      }
+      response = await getData(report, address, pattern);
+      result.push(...response.data.result);
+      status = response.data.status
+      lastResultNo = response.data.result.length
+      console.log("Lenght of last result : " + (lastResultNo).toString())
+      console.log("Lenght of global result : " + (result.length).toString())
+      console.log("Status : " + (status).toString())
+      console.log("Message : " + (response.data.message).toString())
+    }
+  } else {
+    while (lastResultNo >= 10000) {
+      console.log(pattern)
+      if (result.length) {
+        lastBlockNo = result[result.length - 1]["blockNumber"]
+        pattern = `startblock=${lastBlockNo}`
+      }
+      response = await getData(report, address, pattern);
+      result.push(...response.data.result);
+      status = response.data.status
+      lastResultNo = response.data.result.length
+      console.log("Lenght of last result : " + (lastResultNo).toString())
+      console.log("Lenght of global result : " + (result.length).toString())
+      console.log("Status : " + (status).toString())
+      console.log("Message : " + (response.data.message).toString())
 
-  //   }
-  // }
+    }
+  }
 
 
-  response = await getData(report, address, pattern);
-  result.push(...response.data.result);
+  // response = await getData(report, address, pattern);
+  // result.push(...response.data.result);
   return result;
 }
 
@@ -62,7 +64,7 @@ async function createExcel(headers, rows, report, address) {
   for (let i = 0; i < rows.length; i++) {
     let timestamp = rows[i]['timeStamp'];
     rows[i]['datetime'] = utils.timeConverter(timestamp);
-    rows[i]['value_new'] = rows[i]['value'] / 1000000000000000000;
+    rows[i]['valueNew'] = rows[i]['value'] / 1000000000000000000;
     sheet.addRow(rows[i]);
   }
   sheet.commit();
@@ -77,106 +79,66 @@ async function createExcel(headers, rows, report, address) {
   });
 }
 
-async function createExistingExcel(headers, rows, filename, sheet, cell) {
+async function createExistingExcel(headers, rows, filename, sheet, cell, buffer) {
 
-  //  // console.log(file[''].data)
-  // const newWorkbook = new excel.stream.xlsx.WorkbookWriter({});
-  // const newWorksheet = newWorkbook.addWorksheet(sheet);
-  // // const newWorkbook = new excel.Workbook(); 
-  // // const newWorksheet = newWorkbook.addWorksheet(sheet);
-
-  // const oldWorkbook = new excel.Workbook(); 
-  // await oldWorkbook.xlsx.readFile(filename)
-  // const oldWorksheet = oldWorkbook.getWorksheet(sheet);
-
-  // console.log(oldWorkbook)
-  // console.log(oldWorksheet)
-
-  // newWorksheet.model = Object.assign(oldWorksheet.model, {
-  //   mergeCells: oldWorksheet.model.merges
-  // });
+  workbook = await xlsxPopulate.fromDataAsync(buffer);
+  // Make edits.
+  worksheet = workbook.sheet(sheet)
 
 
-  // console.log(filename)
-  // console.log(sheet)
-  // console.log(file[''].data)
-  // var workbook = new excel.Workbook(); 
-  // await workbook.xlsx.readFile(filename)
-  // worksheet.columns = headers;
-  // const worksheet = workbook.getWorksheet(sheet);
-  // var cellToNumber = extractNumber(cell) 
-  // var colNum = cellToNumber[0]
-  // var rowNum = cellToNumber[1]
+  console.log(cell)
+  cellOfHeader = utils.prevCell(cell)
+  cellToModify = cell
 
-  // console.log("----------------")
-  // console.log(newWorkbook)
-  // console.log(newWorksheet)
-  // console.log(extractNumber(cell))
-  // console.log("----------------")
+  console.log('cellOfHeader : ' +  cellOfHeader)
+  console.log('cellToModify : ' +  cellToModify)
+  console.log('length rows : ' +  rows.length)
 
-  // const sheet = workbook.addWorksheet('My Worksheet');
-  // sheet.columns = headers;
-  // for (let i = 0; i < rows.length; i++) {
+  for (let i = 0; i < rows.length; i++) {
+    console.log(rows[i])
+    cellOfHeader = utils.prevCell(cell)
+    cellToModify = (!i) ?  cell[0] + (utils.extractNumberByCell(cellToModify)[1]) : cell[0] + (utils.extractNumberByCell(cellToModify)[1] + 1)
+    console.log("new cellOfHeader : " + cellOfHeader)
+    console.log("new cellToModify : " + cellToModify)
+    var allHeaders = Object.keys(rows[i])
+    allHeaders.push('valueNew')
 
-  //   let timestamp = rows[i]['timeStamp'];
-  //   rows[i]['datetime'] = utils.timeConverter(timestamp);
-  //   rows[i]['value_new'] = rows[i]['value'] / 1000000000000000000;
+    for (let j in allHeaders) {
+      console.log("row[i][worksheet.cell(cellOfHeader).value()] (VALUE) : " + rows[i][worksheet.cell(cellOfHeader).value()])
+      console.log("worksheet.cell(cellOfHeader).value() (KEY) : " + worksheet.cell(cellOfHeader).value())
 
-  //   var row = worksheet.getRow(rowNum);
-
-  //   for (let key in rows[i]) {
-  //     row.getCell(colNum).value = rows[i][key]; // A5's value set to 5
-  //     rowNum ++
-  //     colNum ++
-  //   }
-
-  // }
+      if (allHeaders.includes(worksheet.cell(cellOfHeader).value())){
+        allHeaders = allHeaders.filter(function(e) { return e !== worksheet.cell(cellOfHeader).value() })
+      } else {
+        worksheet.cell(cellOfHeader).value(allHeaders[0])
+        allHeaders = allHeaders.filter(function(e) { return e !== allHeaders[0] })
+      }
+      
 
 
-  // var sourceWorkbook= new excel.Workbook();
-  // var sourceWorksheet;
+      if(worksheet.cell(cellOfHeader).value() == 'datetime'){
+        rows[i]['datetime'] = utils.timeConverter(rows[i]['timeStamp']);
+        value = rows[i]['datetime']
+        worksheet.cell(cellToModify).value(value);
+      } else if (worksheet.cell(cellOfHeader).value() == 'valueNew'){
+        value = (rows[i]['value'] / 1000000000000000000).toString();
+        worksheet.cell(cellToModify).value(value);
+      } else {
+        value = rows[i][worksheet.cell(cellOfHeader).value()]
+        worksheet.cell(cellToModify).value(value);
+      }
 
-  // var targetWorkbook = new excel.stream.xlsx.WorkbookWriter({});
-  // var targetSheet = targetWorkbook.addWorksheet();
 
-  // sourceWorkbook.xlsx.readFile(filename).then(function(){
-  //     sourceWorksheet= sourceWorkbook.getWorksheet(1);
-  //     sourceWorksheet.eachRow((row, rowNumber) => {
-  //         var newRow = targetSheet.getRow(rowNumber);
-  //         row.eachCell((cell, colNumber) => {
-  //             var newCell = newRow.getCell(colNumber)
-  //             for(var prop in cell)
-  //             {
-  //                 newCell[prop] = cell[prop];
-  //             }
-  //         })
-  //   })
-  // });
 
-  // for (let i = 0; i < rows.length; i++) {
-  //   let timestamp = rows[i]['timeStamp'];
-  //   rows[i]['datetime'] = utils.timeConverter(timestamp);
-  //   rows[i]['value_new'] = rows[i]['value'] / 1000000000000000000;
+      cellOfHeader = utils.nextLetter(cellOfHeader[0]) + (utils.extractNumberByCell(cellOfHeader)[1])
+      cellToModify = utils.nextLetter(cellToModify[0]) + (utils.extractNumberByCell(cellToModify)[1])
+      console.log("new cellOfHeader : " + cellOfHeader)
+      console.log("new cellToModify : " + cellToModify)
+    }
+  }
 
-  //   for (let i = 0; i < colNum; i++) {
-  //     rows[i] = {...{}, ...rows[i]};
-  //   }
-
-  //   newWorksheet.addRow(rows[i]);
-  // }
-  // newWorksheet.commit();
-  return new Promise((resolve, reject) => {
-    targetWorkbook.commit().then(() => {
-      const stream = (targetWorkbook).stream;
-      console.log(stream)
-      const result = stream.read();
-      resolve(result);
-    }).catch((e) => {
-      reject(e);
-    });
-  });
-  // const stream = (workbook).stream;
-  // return stream.read();
+  // Get the output
+  return workbook.outputAsync();  
 }
 
 async function createDividedExcel(headers, rows) {
@@ -200,7 +162,7 @@ async function createDividedExcel(headers, rows) {
 
     let timestamp = rows[i]['timeStamp'];
     rows[i]['datetime'] = utils.timeConverter(timestamp);
-    rows[i]['value_new'] = rows[i]['value'] / 1000000000000000000;
+    rows[i]['valueNew'] = rows[i]['value'] / 1000000000000000000;
     sheet.addRow(rows[i]);
 
     if (flagNewExcel) {
@@ -247,50 +209,50 @@ let getColumnList = (report) => {
   switch (report) {
     case 'txlist':
       column = [
-        { header: "Txhash", key: "hash", width: 65 },
-        { header: "Blockno", key: "blockNumber", width: 10 },
-        { header: "DateTime", key: "datetime", width: 10 },
-        { header: "From", key: "from", width: 65 },
-        { header: "To", key: "to", width: 65 },
-        { header: "ContractAddress", key: "contractAddress", width: 65 },
-        { header: "UnixTimestamp", key: "timeStamp", width: 15 },
-        { header: "Nonce", key: "nonce", width: 10 },
-        { header: "BlockHash", key: "blockHash", width: 65 },
-        { header: "TransactionIndex", key: "transactionIndex", width: 15 },
-        { header: "ValueOrigin", key: "value", width: 65 },
-        { header: "Value", key: "value_new", width: 65 },
-        { header: "Gas", key: "gas", width: 10 },
-        { header: "GasPrice", key: "gasPrice", width: 15 },
-        { header: "Error", key: "isError", width: 5 },
-        { header: "Txreceipt_status", key: "txreceipt_status", width: 15 },
-        { header: "Input", key: "input", width: 10 },
-        { header: "CumulativeGasUsed", key: "cumulativeGasUsed", width: 15 },
-        { header: "gasUsed", key: "GasUsed", width: 10 },
+        { header: "hash", key: "hash", width: 65 },
+        { header: "blockNumber", key: "blockNumber", width: 10 },
+        { header: "datetime", key: "datetime", width: 10 },
+        { header: "from", key: "from", width: 65 },
+        { header: "to", key: "to", width: 65 },
+        { header: "contractAddress", key: "contractAddress", width: 65 },
+        { header: "timeStamp", key: "timeStamp", width: 15 },
+        { header: "nonce", key: "nonce", width: 10 },
+        { header: "blockHash", key: "blockHash", width: 65 },
+        { header: "transactionIndex", key: "transactionIndex", width: 15 },
+        { header: "value", key: "value", width: 65 },
+        { header: "valueNew", key: "valueNew", width: 65 },
+        { header: "gas", key: "gas", width: 10 },
+        { header: "gasPrice", key: "gasPrice", width: 15 },
+        { header: "isError", key: "isError", width: 5 },
+        { header: "txreceipt_status", key: "txreceipt_status", width: 15 },
+        { header: "input", key: "input", width: 10 },
+        { header: "cumulativeGasUsed", key: "cumulativeGasUsed", width: 15 },
+        { header: "GasUsed", key: "GasUsed", width: 10 },
         { header: "confirmations", key: "confirmations", width: 15 },
       ];
       break;
     case 'tokentx':
       column = [
-        { header: "Hash", key: "hash", width: 65 },
-        { header: "Blockno", key: "blockNumber", width: 10 },
-        { header: "DateTime", key: "datetime", width: 10 },
-        { header: "From", key: "from", width: 65 },
-        { header: "To", key: "to", width: 65 },
-        { header: "ContractAddress", key: "contractAddress", width: 65 },
-        { header: "UnixTimestamp", key: "timeStamp", width: 15 },
-        { header: "Nonce", key: "nonce", width: 10 },
-        { header: "ValueOrigin", key: "value", width: 65 },
-        { header: "Value", key: "value_new", width: 65 },
-        { header: "BlockHash", key: "blockHash", width: 65 },
-        { header: "TokenName", key: "tokenName", width: 15 },
-        { header: "TokenSymbol", key: "tokenSymbol", width: 15 },
-        { header: "TokenDecimal", key: "tokenDecimal", width: 15 },
-        { header: "TransactionIndex", key: "transactionIndex", width: 15 },
-        { header: "Gas", key: "gas", width: 10 },
-        { header: "GasPrice", key: "gasPrice", width: 10 },
-        { header: "GasUsed", key: "gasUsed", width: 10 },
-        { header: "CumulativeGasUsed", key: "cumulativeGasUsed", width: 15 },
-        { header: "Input", key: "input", width: 10 },
+        { header: "hash", key: "hash", width: 65 },
+        { header: "blockNumber", key: "blockNumber", width: 10 },
+        { header: "datetime", key: "datetime", width: 10 },
+        { header: "from", key: "from", width: 65 },
+        { header: "to", key: "to", width: 65 },
+        { header: "contractAddress", key: "contractAddress", width: 65 },
+        { header: "timeStamp", key: "timeStamp", width: 15 },
+        { header: "nonce", key: "nonce", width: 10 },
+        { header: "value", key: "value", width: 65 },
+        { header: "valueNew", key: "valueNew", width: 65 },
+        { header: "blockHash", key: "blockHash", width: 65 },
+        { header: "tokenName", key: "tokenName", width: 15 },
+        { header: "tokenSymbol", key: "tokenSymbol", width: 15 },
+        { header: "tokenDecimal", key: "tokenDecimal", width: 15 },
+        { header: "transactionIndex", key: "transactionIndex", width: 15 },
+        { header: "gas", key: "gas", width: 10 },
+        { header: "gasPrice", key: "gasPrice", width: 10 },
+        { header: "gasUsed", key: "gasUsed", width: 10 },
+        { header: "cumulativeGasUsed", key: "cumulativeGasUsed", width: 15 },
+        { header: "input", key: "input", width: 10 },
         { header: "confirmations", key: "confirmations", width: 15 },
       ];
       break;
@@ -315,16 +277,6 @@ let getNameFile = (report, address) => {
   return name + '_' + address + '.xlsx'
 }
 
-let extractNumber = (string) => {
-  var matches = string.match(/(\d+)/);
 
-  if (matches) {
-    new_string = string.replace(matches[0], "")
-    console.log(new_string)
-    var n = new_string.charCodeAt(0) - 64;
-    console.log([parseInt(n), parseInt(matches[0])])
-    return [parseInt(n), parseInt(matches[0])];
-  }
-}
 
 module.exports = { getData, getColumnList, IterateOnAllBlockNo, createExcel, createDividedExcel, createExistingExcel }

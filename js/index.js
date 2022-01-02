@@ -3,9 +3,11 @@
 
     const fileSelector = document.getElementById('upload-file');
     var fileList;
+    var loadingDiv = document.getElementById('loading');
 
     // Submit get data
     $("#getDataSubmit").on('click', async function (e) {
+        loadingDiv.style.visibility = 'visible';
         console.log("clicked")
         let form = creationFormObject($('#getDataForm').serializeArray())
         console.log(form)
@@ -23,6 +25,7 @@
         await post("excel", form_data).then(response => response.blob())
         .then(blob => URL.createObjectURL(blob))
         .then(url => {
+            loadingDiv.style.visibility = 'hidden';
             window.open(url, '_blank');
             URL.revokeObjectURL(url);
         });

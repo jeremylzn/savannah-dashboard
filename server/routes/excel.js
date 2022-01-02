@@ -10,10 +10,7 @@ router.post('/excel', async(req, res) => {
     try {
         console.log(req.body)
         console.log(req.files)
-
         result = await etherscan.IterateOnAllBlockNo(req.body.report, req.body.address, (req.body.start) ? req.body.start : false, (req.body.end) ? req.body.end : false);
-
-
         if (parseInt(req.body.divided)){
             var zip = new JSZip();
             const stream = await etherscan.createDividedExcel(etherscan.getColumnList(req.body.report), result)
@@ -30,7 +27,7 @@ router.post('/excel', async(req, res) => {
         } else {
             if (req.files){
                 fs.writeFileSync('tmp.xlsx', req.files['files'].data);
-                var stream = await etherscan.createExistingExcel(etherscan.getColumnList(req.body.report), result, 'tmp.xlsx', req.body.sheet, req.body.cell);
+                var stream = await etherscan.createExistingExcel(etherscan.getColumnList(req.body.report), result, 'tmp.xlsx', req.body.sheet, req.body.cell, req.files['files'].data);
             } else {
                 var stream = await etherscan.createExcel(etherscan.getColumnList(req.body.report), result, req.body.report, req.body.address);
             }
@@ -44,7 +41,7 @@ router.post('/excel', async(req, res) => {
 
     } catch (err) {
         console.log(err)
-        res.status(400).send({ error: 1, message: err.message })
+        res.send({ error: 1, message: err.message })
     }
 })
 

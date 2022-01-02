@@ -40,4 +40,33 @@ async function getBlockNo(date, dater, to=true) {
     );
 }
 
-module.exports = { timeConverter, getBlockNoByDate }
+function prevLetter(letter) {
+    if (letter === 'a'){ return 'a'; }
+    if (letter === 'A'){ return 'A'; }
+    return String.fromCharCode(letter.charCodeAt(0) - 1);
+}
+
+function nextLetter(letter) {
+    if (letter === 'z'){ return 'z'; }
+    if (letter === 'Z'){ return 'Z'; }
+    return String.fromCharCode(letter.charCodeAt(0) + 1);
+}
+
+function prevCell(cell) {
+    currentNumber = extractNumberByCell(cell)
+    prevNumber = (currentNumber[1] > 1) ? currentNumber[1]-1 : currentNumber[1]
+    return cell[0] + prevNumber
+}
+
+let extractNumberByCell = (string) => {
+    var matches = string.match(/(\d+)/);
+  
+    if (matches) {
+      new_string = string.replace(matches[0], "")
+      var n = new_string.charCodeAt(0) - 64;
+      console.log([parseInt(n), parseInt(matches[0])])
+      return [parseInt(n), parseInt(matches[0])];
+    }
+}
+
+module.exports = { timeConverter, getBlockNoByDate, prevLetter, nextLetter, extractNumberByCell, prevCell }
