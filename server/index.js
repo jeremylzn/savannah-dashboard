@@ -14,11 +14,6 @@ const fileUpload = require('express-fileupload');
 // Import routes
 const excelRouter = require('./routes/excel')
 
-console.log(`API_KEY => ${process.env.API_KEY}`)
-console.log(`API_URL => ${process.env.API_URL}`)
-
-
-
 // Initialize server
 const app = express()
 app.use(express.json());
