@@ -79,7 +79,7 @@ async function createExcel(headers, rows, report, address) {
   });
 }
 
-async function createExistingExcel(headers, rows, filename, sheet, cell, buffer) {
+async function createExistingExcel(rows, sheet, cell, buffer) {
 
   workbook = await xlsxPopulate.fromDataAsync(buffer);
   // Make edits.
