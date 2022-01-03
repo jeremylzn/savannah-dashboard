@@ -31,7 +31,7 @@ app.use(function(req, res, next) {
 });
 
   
-app.use(express.static(path.resolve(__dirname,"../")));
+app.use(express.static(path.resolve(__dirname,"../public/")));
 
 const port = process.env.PORT || 3000
 
@@ -39,12 +39,12 @@ const port = process.env.PORT || 3000
 app.use(excelRouter)
 
 app.get('/', (req,res) => {
-    res.sendFile(path.resolve(__dirname,"../"))
+    res.sendFile(path.resolve(__dirname,"../public/"))
 });
 
 // rewrite virtual urls to angular app to enable refreshing of internal pages
 app.get('*', function (req, res, next) {
-    res.sendFile(path.resolve(__dirname,"../index.html"));
+    res.sendFile(path.resolve(__dirname,"../public/index.html"));
 });
 
 // Listening for incoming connections

@@ -2,12 +2,19 @@
   "name": "savannah-dashboard",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./server/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./server/index.js",
-    "dev": "nodemon  ./server/index.js"
+    "start": "node",
+    "dev": "nodemon",
+    "build": "pkg"
   },
+  "pkg": {    
+    "assets": [
+        "./public/*",
+        "./node_modules/*"
+      ]
+ },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jeremylzn/savannah-dashboard.git"
