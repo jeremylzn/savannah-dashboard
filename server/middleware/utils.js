@@ -69,4 +69,10 @@ let extractNumberByCell = (string) => {
     }
 }
 
-module.exports = { timeConverter, getBlockNoByDate, prevLetter, nextLetter, extractNumberByCell, prevCell }
+function removeFirstItems(arr, item) {
+    for ( var i = 0; i < item; i++ ) {
+        arr.shift();
+    }
+}
+
+module.exports = { timeConverter, getBlockNoByDate, prevLetter, nextLetter, extractNumberByCell, prevCell, removeFirstItems }

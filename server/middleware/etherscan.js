@@ -6,8 +6,9 @@ const XLSX = require('xlsx');
 const xlsxPopulate = require('xlsx-populate')
 
 let IterateOnAllBlockNo = async (report, address, start, end) => {
+  console.log('Address => ' + address)
   let pattern = "startblock="
-  let result = []
+  let result = [];
   let lastBlockNo;
   let lastResultNo = 10000;
   let status = 1
@@ -24,6 +25,7 @@ let IterateOnAllBlockNo = async (report, address, start, end) => {
         pattern = `startblock=${lastBlockNo}&endblock=${fromToList[1]}`
       }
       response = await getData(report, address, pattern);
+      if (result.length) utils.removeFirstItems(response.data.result, 2)
       result.push(...response.data.result);
       status = response.data.status
       lastResultNo = response.data.result.length
@@ -33,13 +35,14 @@ let IterateOnAllBlockNo = async (report, address, start, end) => {
       console.log("Message : " + (response.data.message).toString())
     }
   } else {
-    while (lastResultNo >= 10000) {
+    while (lastResultNo >= 9998) {
       console.log(pattern)
       if (result.length) {
         lastBlockNo = result[result.length - 1]["blockNumber"]
         pattern = `startblock=${lastBlockNo}`
       }
       response = await getData(report, address, pattern);
+      if (result.length) utils.removeFirstItems(response.data.result, 2)
       result.push(...response.data.result);
       status = response.data.status
       lastResultNo = response.data.result.length
@@ -64,7 +67,7 @@ async function createExcel(headers, rows, report, address) {
   for (let i = 0; i < rows.length; i++) {
     let timestamp = rows[i]['timeStamp'];
     rows[i]['datetime'] = utils.timeConverter(timestamp);
-    rows[i]['valueNew'] = rows[i]['value'] / 1000000000000000000;
+    rows[i]['Adjusted Value'] = rows[i]['value'] / 1000000000000000000;
     sheet.addRow(rows[i]);
   }
   sheet.commit();
@@ -101,7 +104,7 @@ async function createExistingExcel(rows, sheet, cell, buffer) {
     console.log("new cellOfHeader : " + cellOfHeader)
     console.log("new cellToModify : " + cellToModify)
     var allHeaders = Object.keys(rows[i])
-    allHeaders.push('valueNew')
+    allHeaders.push('Adjusted Value')
 
     for (let j in allHeaders) {
       console.log("row[i][worksheet.cell(cellOfHeader).value()] (VALUE) : " + rows[i][worksheet.cell(cellOfHeader).value()])
@@ -120,7 +123,7 @@ async function createExistingExcel(rows, sheet, cell, buffer) {
         rows[i]['datetime'] = utils.timeConverter(rows[i]['timeStamp']);
         value = rows[i]['datetime']
         worksheet.cell(cellToModify).value(value);
-      } else if (worksheet.cell(cellOfHeader).value() == 'valueNew'){
+      } else if (worksheet.cell(cellOfHeader).value() == 'Adjusted Value'){
         value = (rows[i]['value'] / 1000000000000000000).toString();
         worksheet.cell(cellToModify).value(value);
       } else {
@@ -162,7 +165,7 @@ async function createDividedExcel(headers, rows) {
 
     let timestamp = rows[i]['timeStamp'];
     rows[i]['datetime'] = utils.timeConverter(timestamp);
-    rows[i]['valueNew'] = rows[i]['value'] / 1000000000000000000;
+    rows[i]['Adjusted Value'] = rows[i]['value'] / 1000000000000000000;
     sheet.addRow(rows[i]);
 
     if (flagNewExcel) {
@@ -217,7 +220,7 @@ let getColumnList = (report) => {
         { header: "to", key: "to", width: 65 },
         { header: "contractAddress", key: "contractAddress", width: 65 },
         { header: "value", key: "value", width: 65 },
-        { header: "valueNew", key: "valueNew", width: 65 },
+        { header: "Adjusted Value", key: "Adjusted Value", width: 65 },
         { header: "txreceipt_status", key: "txreceipt_status", width: 15 },
         { header: "isError", key: "isError", width: 5 },
         { header: "transactionIndex", key: "transactionIndex", width: 15 },
@@ -241,7 +244,7 @@ let getColumnList = (report) => {
         { header: "to", key: "to", width: 65 },
         { header: "contractAddress", key: "contractAddress", width: 65 },
         { header: "value", key: "value", width: 65 },
-        { header: "valueNew", key: "valueNew", width: 65 },
+        { header: "Adjusted Value", key: "Adjusted Value", width: 65 },
         { header: "tokenName", key: "tokenName", width: 15 },
         { header: "tokenSymbol", key: "tokenSymbol", width: 15 },
         { header: "tokenDecimal", key: "tokenDecimal", width: 15 },
