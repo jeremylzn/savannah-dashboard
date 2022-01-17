@@ -20,7 +20,8 @@ async function getBlockNoByDate(start, end) {
     console.log(start)
     console.log(end)
 
-    const provider = new Web3.providers.HttpProvider("http://nginx:qp30CnrjDFu4z8@34.251.89.147:8546");
+    // const provider = new Web3.providers.HttpProvider("http://nginx:qp30CnrjDFu4z8@34.251.89.147:8546");
+    const provider = new Web3.providers.HttpProvider("http://lemon:zfT5PAbec9LLdjus@34.242.73.161:8547");
     const web3 = new Web3(provider);
     const dater = new EthDater(web3);
 
