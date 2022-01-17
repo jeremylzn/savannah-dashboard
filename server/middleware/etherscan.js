@@ -60,14 +60,15 @@ let IterateOnAllBlockNo = async (report, address, start, end) => {
   return result;
 }
 
-async function createExcel(headers, rows, report, address) {
+async function createExcel(headers, rows, report, address, reportType) {
   const workbook = new excel.stream.xlsx.WorkbookWriter({});
   const sheet = workbook.addWorksheet('My Worksheet');
   sheet.columns = headers;
   for (let i = 0; i < rows.length; i++) {
     let timestamp = rows[i]['timeStamp'];
+    if (reportType == 'txlist'){ rows[i]['fee'] = (rows[i]['gasPrice'] * rows[i]['gasUsed'] / 1000000000000000000).toString()}
     rows[i]['datetime'] = utils.timeConverter(timestamp);
-    rows[i]['Adjusted Value'] = rows[i]['value'] / 1000000000000000000;
+    rows[i]['adjustedValue'] =  ('tokenDecimal' in rows[i]) ? (rows[i]['value'] / utils.getNumberToDivide(rows[i]['tokenDecimal'])).toString() : (rows[i]['value'] / 1000000000000000000 ).toString()
     sheet.addRow(rows[i]);
   }
   sheet.commit();
@@ -82,61 +83,56 @@ async function createExcel(headers, rows, report, address) {
   });
 }
 
-async function createExistingExcel(rows, sheet, cell, buffer) {
+async function createExistingExcel(rows, sheet, cell, buffer, reportType) {
+  // console.log('REPORT TYPE =>  ' +  reportType)
 
   workbook = await xlsxPopulate.fromDataAsync(buffer);
   // Make edits.
   worksheet = workbook.sheet(sheet)
 
 
-  console.log(cell)
+  // console.log(cell)
   cellOfHeader = utils.prevCell(cell)
   cellToModify = cell
 
-  console.log('cellOfHeader : ' +  cellOfHeader)
-  console.log('cellToModify : ' +  cellToModify)
-  console.log('length rows : ' +  rows.length)
+  // console.log('cellOfHeader : ' +  cellOfHeader)
+  // console.log('cellToModify : ' +  cellToModify)
+  // console.log('length rows : ' +  rows.length)
 
   for (let i = 0; i < rows.length; i++) {
-    console.log(rows[i])
+    // console.log(rows[i])
     cellOfHeader = utils.prevCell(cell)
     cellToModify = (!i) ?  cell[0] + (utils.extractNumberByCell(cellToModify)[1]) : cell[0] + (utils.extractNumberByCell(cellToModify)[1] + 1)
-    console.log("new cellOfHeader : " + cellOfHeader)
-    console.log("new cellToModify : " + cellToModify)
-    var allHeaders = Object.keys(rows[i])
-    allHeaders.push('Adjusted Value')
+    // console.log("new cellOfHeader : " + cellOfHeader)
+    // console.log("new cellToModify : " + cellToModify)
 
-    for (let j in allHeaders) {
-      console.log("row[i][worksheet.cell(cellOfHeader).value()] (VALUE) : " + rows[i][worksheet.cell(cellOfHeader).value()])
-      console.log("worksheet.cell(cellOfHeader).value() (KEY) : " + worksheet.cell(cellOfHeader).value())
+    headers = utils.getHeaders(reportType)
+    for (let item of headers) {
+        // console.log("(HEADER) : " + item['header'] +  " => (VALUE) : " + rows[i][item['key']]);
+        if(item['key'] == 'datetime'){
+          rows[i][item['key']] = utils.timeConverter(rows[i]['timeStamp']);
+          value = rows[i][item['key']];
+          worksheet.cell(cellOfHeader).value(item['header']);
+          worksheet.cell(cellToModify).value(value);
+        } else if (item['key'] == 'adjustedValue'){
+          // Checking if tokenDecimal exist in the reponse
+          value =  ('tokenDecimal' in rows[i]) ? (rows[i]['value'] / utils.getNumberToDivide(rows[i]['tokenDecimal'])).toString() : (rows[i]['value'] / 1000000000000000000 ).toString()
+          worksheet.cell(cellOfHeader).value(item['header']);
+          worksheet.cell(cellToModify).value(value);
+        } else if (item['key'] == 'fee'){
+          value = (rows[i]['gasPrice'] * rows[i]['gasUsed'] / 1000000000000000000).toString();
+          worksheet.cell(cellOfHeader).value(item['header']);
+          worksheet.cell(cellToModify).value(value);
+        } else {
+          worksheet.cell(cellOfHeader).value(item['header']);
+          worksheet.cell(cellToModify).value(rows[i][item['key']]);
+        }
 
-      if (allHeaders.includes(worksheet.cell(cellOfHeader).value())){
-        allHeaders = allHeaders.filter(function(e) { return e !== worksheet.cell(cellOfHeader).value() })
-      } else {
-        worksheet.cell(cellOfHeader).value(allHeaders[0])
-        allHeaders = allHeaders.filter(function(e) { return e !== allHeaders[0] })
-      }
-      
-
-
-      if(worksheet.cell(cellOfHeader).value() == 'datetime'){
-        rows[i]['datetime'] = utils.timeConverter(rows[i]['timeStamp']);
-        value = rows[i]['datetime']
-        worksheet.cell(cellToModify).value(value);
-      } else if (worksheet.cell(cellOfHeader).value() == 'Adjusted Value'){
-        value = (rows[i]['value'] / 1000000000000000000).toString();
-        worksheet.cell(cellToModify).value(value);
-      } else {
-        value = rows[i][worksheet.cell(cellOfHeader).value()]
-        worksheet.cell(cellToModify).value(value);
-      }
-
-
-
-      cellOfHeader = utils.nextLetter(cellOfHeader[0]) + (utils.extractNumberByCell(cellOfHeader)[1])
-      cellToModify = utils.nextLetter(cellToModify[0]) + (utils.extractNumberByCell(cellToModify)[1])
-      console.log("new cellOfHeader : " + cellOfHeader)
-      console.log("new cellToModify : " + cellToModify)
+        
+        cellOfHeader = utils.nextLetter(cellOfHeader[0]) + (utils.extractNumberByCell(cellOfHeader)[1])
+        cellToModify = utils.nextLetter(cellToModify[0]) + (utils.extractNumberByCell(cellToModify)[1])
+        // console.log("new cellOfHeader : " + cellOfHeader)
+        // console.log("new cellToModify : " + cellToModify)
     }
   }
 
@@ -144,7 +140,7 @@ async function createExistingExcel(rows, sheet, cell, buffer) {
   return workbook.outputAsync();  
 }
 
-async function createDividedExcel(headers, rows) {
+async function createDividedExcel(headers, rows, reportType) {
   let ExcelList = [];
   let flagNewExcel = false;
   let lineCounter;
@@ -160,26 +156,22 @@ async function createDividedExcel(headers, rows) {
       lineCounter = 0;
     }
 
-
-
+    if (reportType == 'txlist'){
+      rows[i]['fee'] = (rows[i]['gasPrice'] * rows[i]['gasUsed'] / 1000000000000000000).toString();
+    }
 
     let timestamp = rows[i]['timeStamp'];
     rows[i]['datetime'] = utils.timeConverter(timestamp);
-    rows[i]['Adjusted Value'] = rows[i]['value'] / 1000000000000000000;
+    rows[i]['adjustedValue'] =  ('tokenDecimal' in rows[i]) ? (rows[i]['value'] / utils.getNumberToDivide(rows[i]['tokenDecimal'])).toString() : (rows[i]['value'] / 1000000000000000000 ).toString()
     sheet.addRow(rows[i]);
 
     if (flagNewExcel) {
-
-
       sheet.commit();
-
       ExcelList.push(workbook)
-
       workbook = new excel.stream.xlsx.WorkbookWriter({});
       sheet = workbook.addWorksheet('My Worksheet');
       sheet.columns = headers;
       flagNewExcel = false;
-
     }
 
   }
@@ -263,21 +255,6 @@ let getColumnList = (report) => {
       console.log("wrong report")
   }
   return column
-}
-
-let getNameFile = (report, address) => {
-  let name;
-  switch (report) {
-    case 'txlist':
-      name = 'Transactions'
-      break;
-    case 'tokentx':
-      name = 'ERC-20'
-      break;
-    default:
-      console.log("wrong report")
-  }
-  return name + '_' + address + '.xlsx'
 }
 
 

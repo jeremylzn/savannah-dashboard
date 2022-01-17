@@ -26,8 +26,17 @@
         .then(blob => URL.createObjectURL(blob))
         .then(url => {
             loadingDiv.style.visibility = 'hidden';
-            window.open(url, '_blank');
-            URL.revokeObjectURL(url);
+            // window.open(url, '_blank');
+            // URL.revokeObjectURL(url);
+            // create <a> tag dinamically
+            var fileLink = document.createElement('a');
+            fileLink.href = url;
+
+            // it forces the name of the downloaded file
+            fileLink.download = getNameFile(form.report, form.address, (form.divided == "1") ? true : false, (form.end) ? form.end : false);
+
+            // triggers the click event
+            fileLink.click();
         });
 
 
