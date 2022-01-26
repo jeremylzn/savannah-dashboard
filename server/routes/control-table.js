@@ -5,21 +5,25 @@ const database = require('../config/firebase');
 // Add new address
 router.post('/address', async(req, res) => {
     try {
-        console.log('/address')
-
-        // const usersDb = database.collection('tests'); 
-        // const liam = usersDb.doc('lragozzine'); 
-        // await liam.set({
-        //     first: 'Liam',
-        //     last: 'Ragozzine',
-        //     address: '133 5th St., San Francisco, CA',
-        //     birthday: '05/13/1990',
-        //     age: '30'
-        //    });
-        res.send({ error: 0, message: '/address' })
+        const address_collection = database.collection('control_table'); 
+        const address = address_collection.doc(req.body.address); 
+        await address.set(req.body);
+        res.send({ error: 0, message: `Address successfully added : ${req.body.address}` });
     } catch (err) {
-        console.log(err)
-        res.send({ error: 1, message: err.message })
+        console.log(err);
+        res.send({ error: 1, message: err.message });
+    }
+})
+
+// Get addresses from control-table
+router.get('/address', async(req, res) => {
+    try {
+        const snapshot = await database.collection('control_table').get()
+        const rows = snapshot.docs.map(doc => doc.data());
+        res.send(rows);
+    } catch (err) {
+        console.log(err);
+        res.send({ error: 1, message: err.message });
     }
 })
 

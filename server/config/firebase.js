@@ -22,13 +22,25 @@ var serviceAccount = require("./savannah-f0b6e-firebase-adminsdk-o7xgp-f39dfc6ee
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-//   databaseURL: `https://savannah.firebaseio.com`
+  databaseURL: `https://savannah-f0b6e-default-rtdb.firebaseio.com`
 });
-const database = admin.firestore(); 
-var ref = database.ref("restricted_access/secret_document");
-ref.once("value", function(snapshot) {
-console.log(snapshot.val());
-});
+// const database = admin.firestore(); 
+let database = admin.firestore()
+
+// const usersDb = database.collection('tests'); 
+// const liam = usersDb.doc('lragozzine'); 
+// liam.set({
+//     first: 'Liam',
+//     last: 'Ragozzine',
+//     address: '133 5th St., San Francisco, CA',
+//     birthday: '05/13/1990',
+//     age: '30'
+//    });
+
+// var ref = database.ref("restricted_access/secret_document");
+// ref.once("value", function(snapshot) {
+// console.log(snapshot.val());
+// });
 // let database = admin.database()
 
-module.exports = { database }
+module.exports =  database 
