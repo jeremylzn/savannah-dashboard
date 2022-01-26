@@ -9,10 +9,9 @@ dotenv.config() // Makes environment variables available
 const fileUpload = require('express-fileupload');
 
 
-
-
 // Import routes
 const excelRouter = require('./routes/excel')
+const controlTableRouter = require('./routes/control-table')
 
 // Initialize server
 const app = express()
@@ -37,6 +36,8 @@ const port = process.env.PORT || 3000
 
 // Use routes
 app.use(excelRouter)
+app.use(controlTableRouter)
+
 
 app.get('/', (req,res) => {
     res.sendFile(path.resolve(__dirname,"../public/"))
