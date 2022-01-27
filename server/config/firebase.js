@@ -27,20 +27,4 @@ admin.initializeApp({
 // const database = admin.firestore(); 
 let database = admin.firestore()
 
-// const usersDb = database.collection('tests'); 
-// const liam = usersDb.doc('lragozzine'); 
-// liam.set({
-//     first: 'Liam',
-//     last: 'Ragozzine',
-//     address: '133 5th St., San Francisco, CA',
-//     birthday: '05/13/1990',
-//     age: '30'
-//    });
-
-// var ref = database.ref("restricted_access/secret_document");
-// ref.once("value", function(snapshot) {
-// console.log(snapshot.val());
-// });
-// let database = admin.database()
-
 module.exports =  database 
