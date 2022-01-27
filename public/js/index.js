@@ -38,10 +38,6 @@
             // triggers the click event
             fileLink.click();
         });
-
-
-
-
     });
 
     $('.radio').change(function () {

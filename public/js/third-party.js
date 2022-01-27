@@ -2,6 +2,10 @@ let post = function(url, data) {
     return fetch(url, {method: "POST", body: data});
 }
 
+let get = function(url) {
+    return fetch(url, {method: "GET"});
+}
+
 let getNameFile = (report, address, divided=false, end_date = false) => {
     let name;
     let final;
