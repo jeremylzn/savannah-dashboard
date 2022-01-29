@@ -1,4 +1,3 @@
-const axios = require('axios');
 const excel = require('exceljs');
 const utils = require('./utils')
 const fs = require('fs');
@@ -24,7 +23,7 @@ let IterateOnAllBlockNo = async (report, address, start, end) => {
         lastBlockNo = result[result.length - 1]["blockNumber"]
         pattern = `startblock=${lastBlockNo}&endblock=${fromToList[1]}`
       }
-      response = await getData(report, address, pattern);
+      response = await utils.getData(report, address, pattern);
       if (result.length) utils.removeFirstItems(response.data.result, 2)
       result.push(...response.data.result);
       status = response.data.status
@@ -41,7 +40,7 @@ let IterateOnAllBlockNo = async (report, address, start, end) => {
         lastBlockNo = result[result.length - 1]["blockNumber"]
         pattern = `startblock=${lastBlockNo}`
       }
-      response = await getData(report, address, pattern);
+      response = await utils.getData(report, address, pattern);
       if (result.length) utils.removeFirstItems(response.data.result, 2)
       result.push(...response.data.result);
       status = response.data.status
@@ -192,12 +191,12 @@ async function createDividedExcel(headers, rows, reportType) {
   return ExcelList
 }
 
-let getData = async (report, address, startBlock) => {
-  let url = `${process.env.API_URL}&action=${report}&address=${address}&${startBlock}&endblock=&sort=asc&apikey=${process.env.API_KEY}`
-  console.log(url)
-  response = await axios.get(url);
-  return response;
-}
+// let getData = async (report, address, startBlock) => {
+//   let url = `${process.env.API_URL}&action=${report}&address=${address}&${startBlock}&endblock=&sort=asc&apikey=${process.env.API_KEY}`
+//   console.log(url)
+//   response = await axios.get(url);
+//   return response;
+// }
 
 let getColumnList = (report) => {
   let column = []
@@ -259,4 +258,4 @@ let getColumnList = (report) => {
 
 
 
-module.exports = { getData, getColumnList, IterateOnAllBlockNo, createExcel, createDividedExcel, createExistingExcel }
+module.exports = { getColumnList, IterateOnAllBlockNo, createExcel, createDividedExcel, createExistingExcel }

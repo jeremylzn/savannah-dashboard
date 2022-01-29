@@ -1,6 +1,10 @@
 
 const Web3 = require('web3');
+const Contract = require('web3-eth-contract');
 const EthDater = require('ethereum-block-by-date');
+const dotenv = require('dotenv') 
+dotenv.config() // Makes environment variables available
+const axios = require('axios');
 
 function timeConverter(UNIX_timestamp) {
     var a = new Date(UNIX_timestamp * 1000);
@@ -15,14 +19,46 @@ function timeConverter(UNIX_timestamp) {
     return time;
 }
 
+function getWeb3Instance(){
+    const provider = new Web3.providers.HttpProvider(`http://${process.env.WEB3_USER}:${process.env.WEB3_PASSWORD}@${process.env.WEB3_HOST}:${process.env.WEB3_PORT}/api`);
+    const web3 = new Web3(provider);
+    return web3
+}
+
+function getWeb3Contract(address){
+    // set provider for all later instances to use
+    Contract.setProvider(`http://${process.env.WEB3_USER}:${process.env.WEB3_PASSWORD}@${process.env.WEB3_HOST}:${process.env.WEB3_PORT}/api`);
+    var contract = new Contract([], address);
+    console.log(contract.defaultChain)
+}
+
+async function checkTypeAddress(web3, address){
+    if (address) return await web3.eth.getCode(address) == "0x" ? "EOA" : "Contract"
+}
+
+let getData = async (report, address, startBlock) => {
+    let url = `${process.env.API_URL}&action=${report}&address=${address}&${startBlock}&endblock=&sort=asc&apikey=${process.env.API_KEY}`
+    console.log(url)
+    response = await axios.get(url);
+    return response;
+}
+
+let getFirstDate = async (address) => {
+    let temp = new Date();
+    for (let i of ['txlist', 'tokentx']){
+        response = await getData(i, address, 'startblock=');
+        data = response.data.result[0];
+        temp = (new Date(data.timeStamp * 1000) < temp) ? new Date(data.timeStamp * 1000) : temp
+    }
+    return temp
+}
+
 async function getBlockNoByDate(start, end) {
     console.log("getBlockNoByDate")
     console.log(start)
     console.log(end)
 
-    // const provider = new Web3.providers.HttpProvider("http://nginx:qp30CnrjDFu4z8@34.251.89.147:8546");
-    const provider = new Web3.providers.HttpProvider("http://lemon:zfT5PAbec9LLdjus@34.242.73.161:8547/api");
-    const web3 = new Web3(provider);
+    const web3 = getWeb3Instance()
     const dater = new EthDater(web3);
 
     const from = await getBlockNo(start, dater)
@@ -162,5 +198,5 @@ let getNameFile = (report, address, divided = false, counter_divided = false, en
 
 module.exports = {
     timeConverter, getBlockNoByDate, prevLetter, nextLetter, extractNumberByCell, prevCell, removeFirstItems,
-    getHeaders, getNumberToDivide, getNameFile
+    getHeaders, getNumberToDivide, getNameFile, getWeb3Instance, getWeb3Contract, checkTypeAddress, getData, getFirstDate
 }

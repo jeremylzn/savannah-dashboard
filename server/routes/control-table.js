@@ -1,14 +1,22 @@
 const express = require('express');
 const router = new express.Router();
 const database = require('../config/firebase');
+const utils = require('../middleware/utils')
 
 // Add new address
 router.post('/address', async(req, res) => {
     try {
+        let data = req.body
+        const web3 = utils.getWeb3Instance()
+        data.type = await utils.checkTypeAddress(web3, data.address)
+        data.first_date = await utils.getFirstDate(data.address)
+        // const data = await web3.eth.getTransaction(req.body.address)
         const address_collection = database.collection('control_table'); 
-        const address = address_collection.doc(req.body.address); 
+        const address = address_collection.doc(data.address); 
         await address.set(req.body, {merge: true});
-        res.send({ error: 0, message: `Address successfully added : ${req.body.address}` });
+        res.send({ error: 0, message: `Address successfully added : ${data.address}` });
+        // console.log(data)
+        // res.send({});
     } catch (err) {
         console.log(err);
         res.send({ error: 1, message: err.message });

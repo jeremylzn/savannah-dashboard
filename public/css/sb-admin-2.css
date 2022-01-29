@@ -11304,14 +11304,6 @@ body.sidebar-toggled footer.sticky-footer {
   margin-top: 1rem;
 }
 
-.tdfield{
-  width: 160px;
-  height: 15px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  }
-
 /* Absolute Center Spinner */
 .loading {
   position: fixed;
