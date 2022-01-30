@@ -17,7 +17,7 @@ let IterateOnAllBlockNo = async (report, address, start, end) => {
     fromToList = await utils.getBlockNoByDate(start, end)
     console.log(fromToList)
     pattern = `startblock=${fromToList[0]}&endblock=${fromToList[1]}`
-    while (lastResultNo >= 10000) {
+    while (lastResultNo >= 9998) {
       console.log(pattern)
       if (result.length) {
         lastBlockNo = result[result.length - 1]["blockNumber"]

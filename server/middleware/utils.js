@@ -2,7 +2,7 @@
 const Web3 = require('web3');
 const Contract = require('web3-eth-contract');
 const EthDater = require('ethereum-block-by-date');
-const dotenv = require('dotenv') 
+const dotenv = require('dotenv')
 dotenv.config() // Makes environment variables available
 const axios = require('axios');
 
@@ -19,20 +19,20 @@ function timeConverter(UNIX_timestamp) {
     return time;
 }
 
-function getWeb3Instance(){
+function getWeb3Instance() {
     const provider = new Web3.providers.HttpProvider(`http://${process.env.WEB3_USER}:${process.env.WEB3_PASSWORD}@${process.env.WEB3_HOST}:${process.env.WEB3_PORT}/api`);
     const web3 = new Web3(provider);
     return web3
 }
 
-function getWeb3Contract(address){
+function getWeb3Contract(address) {
     // set provider for all later instances to use
     Contract.setProvider(`http://${process.env.WEB3_USER}:${process.env.WEB3_PASSWORD}@${process.env.WEB3_HOST}:${process.env.WEB3_PORT}/api`);
     var contract = new Contract([], address);
     console.log(contract.defaultChain)
 }
 
-async function checkTypeAddress(web3, address){
+async function checkTypeAddress(web3, address) {
     if (address) return await web3.eth.getCode(address) == "0x" ? "EOA" : "Contract"
 }
 
@@ -45,12 +45,46 @@ let getData = async (report, address, startBlock) => {
 
 let getFirstDate = async (address) => {
     let temp = new Date();
-    for (let i of ['txlist', 'tokentx']){
+    for (let i of ['txlist', 'tokentx']) {
         response = await getData(i, address, 'startblock=');
         data = response.data.result[0];
         temp = (new Date(data.timeStamp * 1000) < temp) ? new Date(data.timeStamp * 1000) : temp
     }
     return temp
+}
+
+let getFirstandLastDateByAddress = async (address) => {
+    console.log('Address => ' + address)
+    let pattern = "startblock="
+    let result = [];
+    let lastBlockNo;
+    let lastResultNo = 10000;
+    let ctn = 0;
+    let final = [[]];
+
+    for (let report of ['txlist', 'tokentx']) {
+        ctn = O;
+        while (lastResultNo >= 9998) {
+            if (result.length) {
+                lastBlockNo = result[result.length - 1]["blockNumber"]
+                pattern = `startblock=${lastBlockNo}`
+            }
+            response = await getData(report, address, pattern);
+            if (result.length) removeFirstItems(response.data.result, 2)
+            result.push(...response.data.result);
+
+            if (ctn == 0) final[0].push(response.data.result[0].timeStamp)
+
+            console.log("Lenght of last result : " + (lastResultNo).toString())
+            console.log("Lenght of global result : " + (result.length).toString())
+            console.log("Message : " + (response.data.message).toString())
+
+            ctn += 1;
+        }
+        (final.length == 1) ? final.push([result[result.length - 1]["timeStamp"]]) : final[1].push(result[result.length - 1]["timeStamp"])
+    }
+
+    console.log('FINAL :', final)
 }
 
 async function getBlockNoByDate(start, end) {
@@ -198,5 +232,5 @@ let getNameFile = (report, address, divided = false, counter_divided = false, en
 
 module.exports = {
     timeConverter, getBlockNoByDate, prevLetter, nextLetter, extractNumberByCell, prevCell, removeFirstItems,
-    getHeaders, getNumberToDivide, getNameFile, getWeb3Instance, getWeb3Contract, checkTypeAddress, getData, getFirstDate
+    getHeaders, getNumberToDivide, getNameFile, getWeb3Instance, getWeb3Contract, checkTypeAddress, getData, getFirstDate, getFirstandLastDateByAddress
 }

@@ -10,6 +10,7 @@ router.post('/address', async(req, res) => {
         const web3 = utils.getWeb3Instance()
         data.type = await utils.checkTypeAddress(web3, data.address)
         data.first_date = await utils.getFirstDate(data.address)
+        await utils.getFirstandLastDateByAddress(data.address)
         // const data = await web3.eth.getTransaction(req.body.address)
         const address_collection = database.collection('control_table'); 
         const address = address_collection.doc(data.address); 
