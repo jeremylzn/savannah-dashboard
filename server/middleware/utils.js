@@ -55,24 +55,29 @@ let getFirstDate = async (address) => {
 
 let getFirstandLastDateByAddress = async (address) => {
     console.log('Address => ' + address)
-    let pattern = "startblock="
-    let result = [];
+    let pattern;
+    let result;
     let lastBlockNo;
-    let lastResultNo = 10000;
-    let ctn = 0;
+    let lastResultNo;
+    let ctn;
     let final = [[]];
 
     for (let report of ['txlist', 'tokentx']) {
-        ctn = O;
+        ctn = 0;
+        lastResultNo = 10000;
+        pattern = "startblock=";
+        result = [];
         while (lastResultNo >= 9998) {
+            console.log('result.length =>', result.length)
             if (result.length) {
                 lastBlockNo = result[result.length - 1]["blockNumber"]
                 pattern = `startblock=${lastBlockNo}`
+                console.log(pattern)
             }
             response = await getData(report, address, pattern);
             if (result.length) removeFirstItems(response.data.result, 2)
             result.push(...response.data.result);
-
+            lastResultNo = response.data.result.length
             if (ctn == 0) final[0].push(response.data.result[0].timeStamp)
 
             console.log("Lenght of last result : " + (lastResultNo).toString())
@@ -85,6 +90,42 @@ let getFirstandLastDateByAddress = async (address) => {
     }
 
     console.log('FINAL :', final)
+}
+
+let getFirstandLastDateByAddressBis = async (address) => {
+    console.log('Address => ' + address)
+    let pattern;
+    let result;
+    let lastBlockNo;
+    let lastResultNo;
+    let ctn;
+    let final = [[]];
+    let adder;
+
+    for (let report of ['txlist', 'tokentx']) {
+        ctn = 0;
+        lastResultNo = 10000;
+        pattern = "startblock=";
+        result = [];
+        while (lastResultNo >= 9998 || !lastResultNo) {
+            if (result.length) {
+                lastBlockNo = parseInt(result[result.length - 1]["blockNumber"])
+                adder = (ctn == 1) ? Math.floor(lastBlockNo/2) :  Math.floor(adder/2)
+                let pattern_value = (lastBlockNo + adder).toString();
+                pattern = `startblock=${pattern_value}`;
+            }
+            response = await getData(report, address, pattern);
+            if (result.length) removeFirstItems(response.data.result, 2)
+            result.push(...response.data.result);
+            lastResultNo = response.data.result.length
+            if (ctn == 0) final[0].push(response.data.result[0].timeStamp)
+            ctn += 1;
+        }
+        (final.length == 1) ? final.push([result[result.length - 1]["timeStamp"]]) : final[1].push(result[result.length - 1]["timeStamp"])
+    }
+
+    console.log('FINAL :', final);
+    return [Math.min.apply(null, final[0]), Math.max.apply(null, final[1])]
 }
 
 async function getBlockNoByDate(start, end) {
@@ -232,5 +273,6 @@ let getNameFile = (report, address, divided = false, counter_divided = false, en
 
 module.exports = {
     timeConverter, getBlockNoByDate, prevLetter, nextLetter, extractNumberByCell, prevCell, removeFirstItems,
-    getHeaders, getNumberToDivide, getNameFile, getWeb3Instance, getWeb3Contract, checkTypeAddress, getData, getFirstDate, getFirstandLastDateByAddress
+    getHeaders, getNumberToDivide, getNameFile, getWeb3Instance, getWeb3Contract, checkTypeAddress, getData, getFirstDate, getFirstandLastDateByAddress,
+    getFirstandLastDateByAddressBis
 }
