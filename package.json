@@ -6,15 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server/index.js",
-    "dev": "nodemon",
-    "build": "pkg"
+    "dev": "nodemon"
   },
-  "pkg": {    
-    "assets": [
-        "./public/*",
-        "./node_modules/*"
-      ]
- },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jeremylzn/savannah-dashboard.git"
